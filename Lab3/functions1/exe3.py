@@ -1,3 +1,5 @@
+#functions1
+
 # x + y = numheads
 # 2x + 4y = numlegs 
 def solve(numheads, numlegs ):
