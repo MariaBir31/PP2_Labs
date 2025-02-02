@@ -1,4 +1,3 @@
-# Dictionary of movies
 
 movies = [
     {
