@@ -6,4 +6,4 @@ def insertspaces(text):
     return re.sub(r'(?<!\s)(?=[A-Z])', ' ', text).strip()
 
 result = insertspaces(match_text)
-print(result)
+print(result)#insert spaces between words starting with capital letters.

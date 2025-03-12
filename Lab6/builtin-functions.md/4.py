@@ -1,12 +1,19 @@
-import time
-import math
+import time  # Импортируем модуль для задержки
 
 def delayed_sqrt(number, delay_ms):
-    time.sleep(delay_ms / 1000)
-    result = math.sqrt(number)
-    print(f"Square root of {number} after {delay_ms} milliseconds is {result}")
+    time.sleep(delay_ms / 1000)  # Переводим миллисекунды в секунды
+    return pow(number, 0.5)  # Вычисляем квадратный корень
 
-number = int(input())
-delay_ms =int(input())
+num = int(input("Введите число: "))  
+delay = int(input("Введите задержку (в мс): "))  
 
-delayed_sqrt(number, delay_ms)
+print(f"Square root of {num} after {delay} milliseconds is {delayed_sqrt(num, delay)}")
+
+
+
+
+
+
+
+
+
