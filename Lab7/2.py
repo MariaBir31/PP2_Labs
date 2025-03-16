@@ -36,6 +36,6 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    pygame.time.delay(100)  
+    pygame.time.delay(100) 
 
 pygame.quit()
