@@ -129,7 +129,7 @@ while running:
     # Проверяем сбор монет
     for coin in coin_sprites:
         if player.rect.colliderect(coin.rect):
-            player.coins_collected += coin.value
+            player.coins_collected += coin.value #счет монет
             coin.generate_random_rect()
             enemy.increase_speed(player.coins_collected)  # Увеличение скорости врага
 
