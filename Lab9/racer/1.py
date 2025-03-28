@@ -30,61 +30,60 @@ font = pygame.font.SysFont("Verdana", 30)
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = image_player
-        self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT - 70))
-        self.speed = 5
-        self.coins_collected = 0
+        self.image = image_player  # Загружаем изображение игрока
+        self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT - 70))  # Размещаем игрока внизу экрана
+        self.speed = 5  # Скорость движения игрока
+        self.coins_collected = 0  # Количество собранных монет
 
     def move(self):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_RIGHT]:
-            self.rect.move_ip(self.speed, 0)
-        if keys[pygame.K_LEFT]:
-            self.rect.move_ip(-self.speed, 0)
-        self.rect.clamp_ip(screen.get_rect())
+        keys = pygame.key.get_pressed()  # Получаем нажатые клавиши
+        if keys[pygame.K_RIGHT]:  # Если нажата клавиша вправо
+            self.rect.move_ip(self.speed, 0)  # Двигаем игрока вправо
+        if keys[pygame.K_LEFT]:  # Если нажата клавиша влево
+            self.rect.move_ip(-self.speed, 0)  # Двигаем игрока влево
+        self.rect.clamp_ip(screen.get_rect())  # Ограничиваем движение игрока границами экрана
 
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = image_enemy
-        self.rect = self.image.get_rect()
-        self.base_speed = 5  # Базовая скорость
-        self.speed = self.base_speed
-        self.generate_random_rect()
+        self.image = image_enemy  # Загружаем изображение врага
+        self.rect = self.image.get_rect()  # Получаем прямоугольник вокруг изображения
+        self.base_speed = 5  # Базовая скорость врага
+        self.speed = self.base_speed  # Текущая скорость врага
+        self.generate_random_rect()  # Устанавливаем случайное начальное положение
 
     def generate_random_rect(self):
-        self.rect.left = random.randint(0, max(0, WIDTH - self.rect.w))
-        self.rect.bottom = 0
+        self.rect.left = random.randint(0, max(0, WIDTH - self.rect.w))  # Размещаем врага в случайной горизонтальной позиции
+        self.rect.bottom = 0  # Начальное положение сверху экрана
 
     def move(self):
-        self.rect.move_ip(0, self.speed)
-        if self.rect.top > HEIGHT:
-            self.generate_random_rect()
+        self.rect.move_ip(0, self.speed)  # Двигаем врага вниз по экрану
+        if self.rect.top > HEIGHT:  # Если враг вышел за нижнюю границу экрана
+            self.generate_random_rect()  # Перемещаем его обратно наверх
 
     def increase_speed(self, coins):
-        self.speed = self.base_speed + (coins // 10)  # Увеличение каждые 10 монет
+        self.speed = self.base_speed + (coins // 10)  # Увеличиваем скорость каждые 10 собранных монет
 
 
 class Coin(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = image_coin
-        self.rect = self.image.get_rect()
+        self.image = image_coin  # Загружаем изображение монеты
+        self.rect = self.image.get_rect()  # Получаем прямоугольник вокруг изображения
         self.speed = 3  # Скорость падения монеты
-        self.value = random.choice([1, 2, 5])  # Стоимость монеты
-        self.generate_random_rect()
+        self.value = random.choice([1, 2, 5])  # Случайная стоимость монеты (1, 2 или 5 очков)
+        self.generate_random_rect()  # Устанавливаем случайное начальное положение
 
     def generate_random_rect(self):
-        self.rect.left = random.randint(0, max(0, WIDTH - self.rect.w))
-        self.rect.bottom = 0
-        self.value = random.choice([1, 2, 5])  # Перегенерировать вес
+        self.rect.left = random.randint(0, max(0, WIDTH - self.rect.w))  # Размещаем монету в случайной горизонтальной позиции
+        self.rect.bottom = 0  # Начальное положение сверху экрана
+        self.value = random.choice([1, 2, 5])  # Перегенерируем стоимость монеты при создании
 
     def move(self):
-        self.rect.move_ip(0, self.speed)
-        if self.rect.top > HEIGHT:
-            self.generate_random_rect()
-
+        self.rect.move_ip(0, self.speed)  # Двигаем монету вниз по экрану
+        if self.rect.top > HEIGHT:  # Если монета вышла за нижнюю границу экрана
+            self.generate_random_rect()  # Перемещаем её обратно наверх
 
 running = True
 clock = pygame.time.Clock()
