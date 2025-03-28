@@ -6,9 +6,9 @@ import time
 pygame.init()
 
 # Настройки окна
-WIDTH, HEIGHT = 600, 600
+WIDTH, HEIGHT = 600, 600 #ширина, высота экрана
 win = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Snake Maze!!!")
+pygame.display.set_caption("Snake Maze!!!") #заголовок
 
 # Цвета
 YELLOW = (255, 255, 0)
@@ -29,7 +29,7 @@ clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
 # Инициализация змейки
-snake = [(WIDTH//2, HEIGHT//2)]
+snake = [(WIDTH//2, HEIGHT//2)] #центр
 direction = (0, 0)
 
 # Счёт и уровни
@@ -56,7 +56,7 @@ while running:
     # Обрабатываем события
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            running = False  #выходим
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and direction != (0, BLOCK_SIZE):
                 direction = (0, -BLOCK_SIZE)#запрещает двигаться вверх, если змейка движется вниз (чтобы не развернуться в себя).
