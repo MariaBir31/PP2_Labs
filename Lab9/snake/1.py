@@ -1,179 +1,122 @@
-import turtle
+import pygame
+import random
 import time
-import random 
 
-# Инициализация счёта и уровня
+# Инициализация Pygame
+pygame.init()
+
+# Настройки окна
+WIDTH, HEIGHT = 600, 600
+win = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Snake Maze!!!")
+
+# Цвета
+YELLOW = (255, 255, 0)
+ORANGE = (255, 165, 0)
+WHITE = (255, 255, 255)
+GREEN = (0, 128, 0)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+PURPLE = (128, 0, 128)
+COLORS = [RED, BLUE, ORANGE, PURPLE]
+
+# Размер блока и скорость
+BLOCK_SIZE = 20
+speed = 8
+clock = pygame.time.Clock()
+
+# Шрифты
+font = pygame.font.Font(None, 36)
+
+# Инициализация змейки
+snake = [(WIDTH//2, HEIGHT//2)]
+direction = (0, 0)
+
+# Счёт и уровни
 score = 0
 high_score = 0
 level = 1
-foods_eaten = 0  # Количество съеденных звёзд на текущем уровне
-delay = 0.1  # Начальная задержка
+food_timer = 0
+food_lifetime = 100  # Время жизни еды в кадрах
 
-# Создание окна
-wind = turtle.Screen()
-wind.title("Snake Maze!!!")
-wind.bgcolor("green")
-wind.setup(width=600, height=600)
-wind.tracer(0)
+# Генерация еды с разным весом
+def generate_food():
+    while True:
+        pos = (random.randint(0, WIDTH // BLOCK_SIZE - 1) * BLOCK_SIZE,
+               random.randint(0, HEIGHT // BLOCK_SIZE - 1) * BLOCK_SIZE)
+        if pos not in snake:  # Проверка, чтобы еда не попала на змейку
+            return pos, random.choice(COLORS), random.choice([5, 10, 15])  # Разный вес еды
 
-# Создание формы звезды
-star_shape = ((0, 10), (3, 3), (10, 3), (4, -1), (6, -8), 
-              (0, -4), (-6, -8), (-4, -1), (-10, 3), (-3, 3))
-wind.register_shape("star", star_shape)
+food, food_color, food_value = generate_food()
 
-# Создание головы змеи
-head = turtle.Turtle()
-head.shape("square")
-head.color("yellow")
-head.penup()
-head.goto(0, 0)
-head.direction = "Stop"
-
-# Создание еды в виде звезды
-food = turtle.Turtle()
-food.shape("star")
-food.color("gold")
-food.penup()
-food.goto(0, 100)
-
-# Таймер для еды
-last_food_time = time.time()  # Время появления еды
-food_timer = 5  # Через сколько секунд еда исчезает
-
-# Счётчик
-pen = turtle.Turtle()
-pen.speed(0)
-pen.shape("square")
-pen.color("white")
-pen.penup()
-pen.hideturtle()
-pen.goto(0, 250)
-pen.write("Score: 0  High Score: 0  Level: 1", align="center", font=("Arial", 24, "bold"))
-
-# Управление змейкой
-def goup():
-    if head.direction != "down":
-        head.direction = "up"
-
-def godown():
-    if head.direction != "up":
-        head.direction = "down"
-
-def goright():
-    if head.direction != "left":
-        head.direction = "right"
-
-def goleft():
-    if head.direction != "right":
-        head.direction = "left"
-
-def move():
-    if head.direction == "up":
-        head.sety(head.ycor() + 20)
-    if head.direction == "down":
-        head.sety(head.ycor() - 20)
-    if head.direction == "left":
-        head.setx(head.xcor() - 20)
-    if head.direction == "right":
-        head.setx(head.xcor() + 20)
-
-# Привязываем клавиши к движениям
-wind.listen()
-wind.onkeypress(goup, "Up")
-wind.onkeypress(godown, "Down")
-wind.onkeypress(goleft, "Left")
-wind.onkeypress(goright, "Right")
-
-segments = []
-
-# Основной игровой цикл
-while True:
-    wind.update()
-
-    # Проверяем, прошло ли время, чтобы еда исчезла
-    if time.time() - last_food_time >= food_timer:
-        x, y = random.randint(-270, 270), random.randint(-270, 270)
-        food.goto(x, y)
-        food.color(random.choice(["red", "blue", "gold", "purple", "orange"]))  # Меняем цвет
-        last_food_time = time.time()  # Обновляем таймер
-
-    # Проверка столкновения со стенами
-    if head.xcor() > 290 or head.xcor() < -290 or head.ycor() > 290 or head.ycor() < -290:
-        time.sleep(1)
-        head.goto(0, 0)
-        head.direction = "Stop"
-
-        for segment in segments:
-            segment.goto(1000, 1000)  # Убираем змейку с экрана
-        segments.clear()
+running = True
+while running:
+    win.fill(GREEN)
+    
+    # Обрабатываем события
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP and direction != (0, BLOCK_SIZE):
+                direction = (0, -BLOCK_SIZE)#запрещает двигаться вверх, если змейка движется вниз (чтобы не развернуться в себя).
+            elif event.key == pygame.K_DOWN and direction != (0, -BLOCK_SIZE):
+                direction = (0, BLOCK_SIZE)
+            elif event.key == pygame.K_LEFT and direction != (BLOCK_SIZE, 0):
+                direction = (-BLOCK_SIZE, 0)
+            elif event.key == pygame.K_RIGHT and direction != (-BLOCK_SIZE, 0):
+                direction = (BLOCK_SIZE, 0)
+    
+    # Двигаем змейку
+    if direction != (0, 0):
+        new_head = (snake[0][0] + direction[0], snake[0][1] + direction[1])
         
-        score = 0
-        level = 1
-        foods_eaten = 0
-        delay = 0.1
-        pen.clear()
-        pen.write(f"Score: {score}  High Score: {high_score}  Level: {level}", align="center", font=("Arial", 24, "bold"))
-
-    # Проверка столкновения головы с едой
-    if head.distance(food) < 20:
-        x = random.randint(-270, 270)
-        y = random.randint(-270, 270)
-        food.goto(x, y)
-        food.color(random.choice(["red", "blue", "gold", "purple", "orange"]))
-
-        new_segment = turtle.Turtle()
-        new_segment.speed(0)
-        new_segment.shape("square")
-        new_segment.color("orange")
-        new_segment.penup()
-        segments.append(new_segment)
-
-        score += 10
-        foods_eaten += 1
-
-        # Ускорение и переход на следующий уровень
-        if foods_eaten >= 4:  # Меняем уровень каждые 4 еды
-            level += 1
-            foods_eaten = 0
-            delay = max(0.05, delay - 0.01)  # Уменьшаем задержку (увеличиваем скорость)
-
-        if score > high_score:
-            high_score = score
-
-        pen.clear()
-        pen.write(f"Score: {score}  High Score: {high_score}  Level: {level}", align="center", font=("Arial", 24, "bold"))
-
-        last_food_time = time.time()  # Сбрасываем таймер еды
-
-    # Двигаем тело змейки за головой
-    for index in range(len(segments) - 1, 0, -1):
-        x = segments[index - 1].xcor()
-        y = segments[index - 1].ycor()
-        segments[index].goto(x, y)
-
-    if len(segments) > 0:
-        segments[0].goto(head.xcor(), head.ycor())
-
-    move()
-
-    # Проверяем столкновение головы с телом
-    for segment in segments:
-        if segment.distance(head) < 20:
+        # Проверка столкновений со стенами и самой собой
+        if new_head in snake or new_head[0] < 0 or new_head[0] >= WIDTH or new_head[1] < 0 or new_head[1] >= HEIGHT:
             time.sleep(1)
-            head.goto(0, 0)
-            head.direction = "Stop"
-
-            for segment in segments:
-                segment.goto(1000, 1000)
-            segments.clear()
-
+            snake = [(WIDTH//2, HEIGHT//2)]
+            direction = (0, 0)
             score = 0
+            speed = 10
             level = 1
-            foods_eaten = 0
-            delay = 0.1
-            pen.clear()
-            pen.write(f"Score: {score}  High Score: {high_score}  Level: {level}", align="center", font=("Arial", 24, "bold"))
+        else:
+            snake.insert(0, new_head)
+            
+            # Проверяем, съела ли змейка еду
+            if new_head == food:
+                score += food_value
+                food, food_color, food_value = generate_food()
+                food_timer = 0
+                
+                # Повышение уровня каждые 30 очков
+                if score // 30 + 1 > level:
+                    level += 1
+                    speed += 2  # Увеличиваем скорость
+                
+                if score > high_score:
+                    high_score = score
+            else:
+                snake.pop()
+    
+    # Таймер исчезновения еды
+    food_timer += 1
+    if food_timer > food_lifetime:
+        food, food_color, food_value = generate_food()
+        food_timer = 0
+    
+    # Отрисовка змейки
+    for i, segment in enumerate(snake):
+        color = YELLOW if i == 0 else ORANGE
+        pygame.draw.rect(win, color, (segment[0], segment[1], BLOCK_SIZE, BLOCK_SIZE))
+    
+    # Отрисовка еды
+    pygame.draw.rect(win, food_color, (food[0], food[1], BLOCK_SIZE, BLOCK_SIZE))
+    
+    # Отображение счёта и уровня
+    text = font.render(f"Score: {score}  High Score: {high_score}  Level: {level}", True, WHITE)
+    win.blit(text, (WIDTH//2 - text.get_width()//2, 10))
+    
+    pygame.display.update()
+    clock.tick(speed)
 
-    time.sleep(delay)
-
-wind.mainloop()
+pygame.quit()
