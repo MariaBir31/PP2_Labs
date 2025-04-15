@@ -1,4 +1,3 @@
-#нужно сделать текст колво столкновений, игра не выходит при столкновении
 import pygame
 import random
 import time
@@ -27,7 +26,6 @@ sound_crash = pygame.mixer.Sound('Lab8/resources/crash.wav')
 # Шрифт для отображения очков
 font = pygame.font.SysFont("Verdana", 30)
 
-
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -43,7 +41,6 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_LEFT]:  # Если нажата клавиша влево
             self.rect.move_ip(-self.speed, 0)  # Двигаем игрока влево
         self.rect.clamp_ip(screen.get_rect())  # Ограничиваем движение игрока границами экрана
-
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
@@ -65,7 +62,6 @@ class Enemy(pygame.sprite.Sprite):
 
     def increase_speed(self, coins):
         self.speed = self.base_speed + (coins // 10)  # Увеличиваем скорость каждые 10 собранных монет
-
 
 class Coin(pygame.sprite.Sprite):
     def __init__(self):
@@ -102,6 +98,8 @@ for _ in range(2):  # Три монеты на экране одновремен
     coin_sprites.add(coin)
     all_sprites.add(coin)
 
+collision_count = 0
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -116,24 +114,22 @@ while running:
     for entity in all_sprites:
         screen.blit(entity.image, entity.rect)
 
-    # Проверяем столкновение с врагом
+    # Проверка столкновения с врагом
     if pygame.sprite.spritecollideany(player, enemy_sprites):
         sound_crash.play()
-        time.sleep(1)
-        crash
-        running = False
-        screen.fill("red")
-        game_over_text = font.render("Game Over", True, "black")
-        screen.blit(game_over_text, (WIDTH // 2 - 70, HEIGHT // 2))
-        pygame.display.flip()
-        time.sleep(3)
+        collision_count += 1  # Увеличиваем счетчик столкновений
+        player.rect.center = (WIDTH // 2, HEIGHT - 70)  # Перемещаем игрока обратно на старт
+        enemy.generate_random_rect()  # Перемещаем врага обратно наверх
 
-    # Проверяем сбор монет
+    # Проверка сбор монет
     for coin in coin_sprites:
         if player.rect.colliderect(coin.rect):
-            player.coins_collected += coin.value #счет монет
+            player.coins_collected += coin.value  # Счёт монет
             coin.generate_random_rect()
             enemy.increase_speed(player.coins_collected)  # Увеличение скорости врага
+
+    collision_text = font.render(f"Collisions: {collision_count}", True, "red")
+    screen.blit(collision_text, (10, 10))
 
     # Отображаем количество монет
     coin_text = font.render(f"Coins: {player.coins_collected}", True, "blue")

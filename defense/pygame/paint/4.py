@@ -1,7 +1,12 @@
+#3. было видно линию как рисуешь
+
+
 import pygame
 import math
 
 pygame.init()
+
+
 
 '''
 Горячие клавиши:
@@ -10,7 +15,7 @@ pygame.init()
 3 – Круг
 4 – Квадрат
 5 – Прямоугольный треугольник
-6 – Равносторонний треrугольник
+6 – Равносторонний треугольник
 7 – Ромб
 E – Ластик
 R – Красный цвет
@@ -24,6 +29,9 @@ K – Черный цвет
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Paint")
+
+# palette = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 165, 0), (128, 0, 128)]
+# palette_rects = [pygame.Rect(i * 50, HEIGHT - 50, 50, 50) for i in range(len(palette))]
 
 # Цвета
 WHITE = (255, 255, 255)
@@ -84,6 +92,10 @@ while running:
             if event.button == 1:
                 drawing = True
                 start_pos = event.pos
+            # for i, rect in enumerate(palette_rects):
+            #     if rect.collidepoint(event.pos):
+            #         color = palette[i]  # Меняем цвет
+
 
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1 and drawing:
@@ -94,46 +106,25 @@ while running:
                 if tool == "line":
                     pygame.draw.line(background, color, start_pos, end_pos, thickness)
                 elif tool == "rect":
-                    # Прямоугольник определяется по левому верхнему углу (min(x1, x2), min(y1, y2))
-    # и ширине-высоте (abs(x2 - x1), abs(y2 - y1))
                     pygame.draw.rect(background, color, pygame.Rect(
                         min(x1, x2), min(y1, y2), abs(x2 - x1), abs(y2 - y1)), thickness)
                 elif tool == "circle":
-                    # Центр круга — это начальная точка (start_pos)
-    # Радиус — это расстояние между (x1, y1) и (x2, y2), вычисляемое по теореме Пифагора
                     radius = int(math.hypot(x2 - x1, y2 - y1))
                     pygame.draw.circle(background, color, start_pos, radius, thickness)
                 elif tool == "square":
-                    # Длина стороны квадрата — это минимальное расстояние по оси X или Y
-    # Левый верхний угол — это (x1, y1)
                     side = min(abs(x2 - x1), abs(y2 - y1))
                     pygame.draw.rect(background, color, (x1, y1, side, side), thickness)
                 elif tool == "triangle":
-                    # Указываем три точки: 
-    # (x1, y2) — нижний левый угол
-    # (x2, y2) — нижний правый угол
-    # (x1, y1) — вершина сверху
                     points = [(x1, y2), (x2, y2), (x1, y1)]
                     pygame.draw.polygon(background, color, points, thickness)
                 elif tool == "equilateral":
-                        # Высота треугольника вычисляется как разница координат Y
                     height = abs(y2 - y1)
-                        # Половина основания равностороннего треугольника
                     base_half = height / math.sqrt(3)
-                    # Вершины треугольника:
-    # (x1, y2) — нижняя точка
-    # (x1 - base_half, y1) — левая верхняя точка
-    # (x1 + base_half, y1) — правая верхняя точка
                     points = [(x1, y2), (x1 - base_half, y1), (x1 + base_half, y1)]
                     pygame.draw.polygon(background, color, points, thickness)
                 elif tool == "rhombus":
                     width = abs(x2 - x1)
                     height = abs(y2 - y1)
-                    # Вершины ромба:
-    # (x1, y1 - height // 2) — верхняя точка
-    # (x1 + width // 2, y1) — правая точка
-    # (x1, y1 + height // 2) — нижняя точка
-    # (x1 - width // 2, y1) — левая точка
                     points = [(x1, y1 - height // 2), (x1 + width // 2, y1),
                               (x1, y1 + height // 2), (x1 - width // 2, y1)]
                     pygame.draw.polygon(background, color, points, thickness)
@@ -145,6 +136,11 @@ while running:
         if event.type == pygame.MOUSEMOTION and drawing:
             if tool == "eraser":
                 pygame.draw.circle(background, WHITE, event.pos, thickness)
+            if tool == "line":####
+                current_pos = event.pos####
+
+# for i, rect in enumerate(palette_rects):
+#     pygame.draw.rect(screen, palette[i], rect)
 
     pygame.display.flip()
 
